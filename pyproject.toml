@@ -1,0 +1,26 @@
+[project]
+name = "sat-anomaly"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "marimo>=0.18.4",
+    "cartopy>=0.25.0",
+    "folium>=0.20.0",
+    "netcdf4>=1.7.3",
+    "openeo>=0.46.0",
+    "xarray>=2025.1.1",
+    "typer>=0.20.0",
+    "openai>=2.12.0",
+    "geopandas>=1.1.1",
+    "polars>=1.36.1",
+    "scipy>=1.16.3",
+    "unidecode>=1.4.0",
+    "rasterio>=1.4.4",
+    "rioxarray>=0.20.0",
+    "rasterstats>=0.20.0",
+    "h5netcdf>=1.7.3",
+    "prefect>=3.6.9",
+    "lightgbm>=4.6.0",
+]
