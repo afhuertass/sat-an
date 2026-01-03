@@ -12,3 +12,4 @@ wheels/
 data/*
 
 src/data/*
+src/__marimo__/*
