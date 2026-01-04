@@ -8,41 +8,75 @@ from pydantic import BaseModel, Field
 
 class BaseTrainingConfig(BaseModel):
     # Data / CV
-    n_splits: int = Field(5, ge=2, description="The number of folds for k-fold cross-validation.")
+    n_splits: int = Field(
+        5, ge=2, description="The number of folds for k-fold cross-validation."
+    )
     seed: int = Field(default=42, description="Random seed for reproducibility.")
 
     # Logging
-    wandb_project: str = Field("soiluse-tabular", description="The Weight and Biases project to log to.")
+    wandb_project: str = Field(
+        "soiluse-tabular", description="The Weight and Biases project to log to."
+    )
     run_name: str = Field(..., description="The name of the current run/session.")
 
     # I/O
-    save_artifacts: bool = Field(True, description="Flag to save training artifacts such as models and logs.")
-    output_dir: Path = Field(Path("models"), description="Directory where output artifacts are saved.")
+    save_artifacts: bool = Field(
+        True, description="Flag to save training artifacts such as models and logs."
+    )
+    output_dir: Path = Field(
+        Path("models"), description="Directory where output artifacts are saved."
+    )
     # Dataset assumptions
-    n_classes: int = Field(..., description="The number of unique classes in the dataset.")
+    n_classes: int = Field(
+        ..., description="The number of unique classes in the dataset."
+    )
     # Safety
-    assert_finite_X: bool = Field(True, description="Ensure that all inputs are finite.")
+    assert_finite_X: bool = Field(
+        True, description="Ensure that all inputs are finite."
+    )
 
 
 class LightGBMTrainingConfig(BaseTrainingConfig):
     # Booster params
-    learning_rate: float = Field(0.05, description="The learning rate for the LightGBM model.")
-    num_leaves: int = Field(63, description="The maximum number of leaves in each LightGBM tree.")
+    learning_rate: float = Field(
+        0.05, description="The learning rate for the LightGBM model."
+    )
+    num_leaves: int = Field(
+        63, description="The maximum number of leaves in each LightGBM tree."
+    )
     max_depth: int = Field(-1, description="The maximum depth of the LightGBM trees.")
-    min_data_in_leaf: int = Field(100, description="Minimum number of data points in a leaf.")
-    reg_lambda: float = Field(1.0, description="L2 regularization term on weights in the LightGBM model.")
+    min_data_in_leaf: int = Field(
+        100, description="Minimum number of data points in a leaf."
+    )
+    reg_lambda: float = Field(
+        1.0, description="L2 regularization term on weights in the LightGBM model."
+    )
 
     # Training control
-    num_boost_round: int = Field(2000, description="The number of boosting rounds or trees to build.")
-    early_stopping_rounds: int = Field(100, description="The criteria to stop training if validation score isn't improving.")
-    log_every_n: int = Field(50, description="Frequency of logging the model's metrics during training.")
+    num_boost_round: int = Field(
+        2000, description="The number of boosting rounds or trees to build."
+    )
+    early_stopping_rounds: int = Field(
+        100,
+        description="The criteria to stop training if validation score isn't improving.",
+    )
+    log_every_n: int = Field(
+        50, description="Frequency of logging the model's metrics during training."
+    )
 
     # Sampling
-    subsample: float = Field(0.8, description="The subsample ratio of the training instances for training the LightGBM model.")
-    colsample_bytree: float = Field(0.8, description="The subsample ratio of columns when constructing each tree.")
+    subsample: float = Field(
+        0.8,
+        description="The subsample ratio of the training instances for training the LightGBM model.",
+    )
+    colsample_bytree: float = Field(
+        0.8, description="The subsample ratio of columns when constructing each tree."
+    )
 
     # System
-    n_jobs: int = Field(-1, description="The number of parallel threads used to run LightGBM.")
+    n_jobs: int = Field(
+        -1, description="The number of parallel threads used to run LightGBM."
+    )
 
     def lgb_params(self) -> Dict:
         return dict(
@@ -63,18 +97,35 @@ class LightGBMTrainingConfig(BaseTrainingConfig):
 
 class XGBoostForestTrainingConfig(BaseTrainingConfig):
     # Forest params
-    n_estimators: int = Field(800, description="The number of trees to build in the XGBoost model.")
-    max_depth: int = Field(10, description="The maximum depth of each tree in the XGBoost model.")
-    min_child_weight: float = Field(1.0, description="Minimum sum of instance weight (hessian) needed in a child.")
-    reg_lambda: float = Field(1.0, description="L2 regularization term on weights in the LightGBM model.")
+    n_estimators: int = Field(
+        800, description="The number of trees to build in the XGBoost model."
+    )
+    max_depth: int = Field(
+        10, description="The maximum depth of each tree in the XGBoost model."
+    )
+    min_child_weight: float = Field(
+        1.0, description="Minimum sum of instance weight (hessian) needed in a child."
+    )
+    reg_lambda: float = Field(
+        1.0, description="L2 regularization term on weights in the XGboost model."
+    )
 
     # Sampling
-    subsample: float = Field(0.8, description="The subsample ratio of the training instances for training the LightGBM model.")
-    colsample_bynode: float = Field(0.8, description="The subsample ratio of columns for each split, in each level.")
+    subsample: float = Field(
+        0.8,
+        description="The subsample ratio of the training instances for training the LightGBM model.",
+    )
+    colsample_bynode: float = Field(
+        0.8, description="The subsample ratio of columns for each split, in each level."
+    )
 
     # System
-    n_jobs: int = Field(-1, description="The number of parallel threads used to run LightGBM.")
-    tree_method: str = Field("hist", description="The tree construction algorithm used in XGBoost.")
+    n_jobs: int = Field(
+        -1, description="The number of parallel threads used to run XGboost models."
+    )
+    tree_method: str = Field(
+        "hist", description="The tree construction algorithm used in XGBoost."
+    )
 
     def xgb_params(self) -> Dict:
         return dict(
