@@ -1,8 +1,10 @@
 import lightgbm as lgb
 import wandb
+import xgboost
 from schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
 from sklearn.model_selection import StratifiedKFold
 from wandb.integration.lightgbm import log_summary, wandb_callback
+from wandb.integration.xgboost import WandbCallback
 from xgboost import XGBRFClassifier
 
 
@@ -25,6 +27,7 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     )
     # oof = np.zeros((len(y), cfg.n_classes), dtype=np.float32)
     models = []
+    wandb.login()
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,
@@ -51,47 +54,41 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     return models
 
 
-def train_xgboost_forest_cv(X, y, cfg: XGBoostForestTrainingConfig):
-    import numpy as np
-    import wandb
-    from sklearn.model_selection import StratifiedKFold
+def train_xgboost_forest_cv(
+    X, y, cfg: XGBoostForestTrainingConfig
+) -> list[xgboost.Booster]:
+    """
+    Trains an XGBoost Random Forest model using stratified k-fold cross-validation.
 
-    assert X.shape[0] == y.shape[0]
-    if cfg.assert_finite_X:
-        assert np.isfinite(X).all(), "X contains NaN/inf"
+    Parameters:
+        X (pd.DataFrame): The input features.
+        y (pd.Series): The target variable.
+        cfg (XGBoostForestTrainingConfig): Configuration parameters for training.
 
-    cfg.output_dir.mkdir(parents=True, exist_ok=True)
-
+    Returns:
+        list of xgboost.Booster: A list of trained XGBoost RF models corresponding to each fold.
+    """
     skf = StratifiedKFold(
         n_splits=cfg.n_splits,
         shuffle=True,
         random_state=cfg.seed,
     )
 
-    oof = np.zeros((len(y), cfg.n_classes), dtype=np.float32)
     models = []
-
+    wandb.login()
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,
         config=cfg.model_dump(),
     )
 
-    for fold, (tr, va) in enumerate(skf.split(X, y), 1):
+    for _fold, (tr, va) in enumerate(skf.split(X, y), 1):
         model = XGBRFClassifier(**cfg.xgb_params())
-        model.fit(X[tr], y[tr])
+        model.fit(X[tr], y[tr], WandbCallback(log_model=True))
 
-        proba = model.predict_proba(X[va])
-        oof[va] = proba
-
-        if cfg.save_artifacts:
-            path = cfg.output_dir / f"xgbrf_fold{fold}.json"
-            model.save_model(path)
-            art = wandb.Artifact(f"xgbrf_fold{fold}", type="model")
-            art.add_file(path)
-            run.log_artifact(art)
+        # proba = model.predict_proba(X[va])
 
         models.append(model)
 
     run.finish()
-    return models, oof
+    return models
