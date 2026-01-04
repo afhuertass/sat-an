@@ -1,0 +1,97 @@
+import lightgbm as lgb
+import wandb
+from schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
+from sklearn.model_selection import StratifiedKFold
+from wandb.integration.lightgbm import log_summary, wandb_callback
+from xgboost import XGBRFClassifier
+
+
+def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
+    """
+    Trains a LightGBM model using stratified k-fold cross-validation.
+
+    Parameters:
+        X (pd.DataFrame): The input features.
+        y (pd.Series): The target variable.
+        cfg (LightGBMTrainingConfig): Configuration parameters for training.
+
+    Returns:
+        list of lgb.Booster: A list of trained LightGBM booster models corresponding to each fold.
+    """
+    skf = StratifiedKFold(
+        n_splits=cfg.n_splits,
+        shuffle=True,
+        random_state=cfg.seed,
+    )
+    # oof = np.zeros((len(y), cfg.n_classes), dtype=np.float32)
+    models = []
+    run = wandb.init(
+        project=cfg.wandb_project,
+        name=cfg.run_name,
+        config=cfg.model_dump(),
+    )
+    for _fold, (tr, va) in enumerate(skf.split(X, y), 1):
+        dtrain = lgb.Dataset(X[tr], label=y[tr])
+        dvalid = lgb.Dataset(X[va], label=y[va])
+        booster = lgb.train(
+            params=cfg.lgb_params(),
+            train_set=dtrain,
+            valid_sets=[dvalid],
+            num_boost_round=cfg.num_boost_round,
+            callbacks=[
+                lgb.early_stopping(cfg.early_stopping_rounds, verbose=False),
+                wandb_callback(),
+            ],
+        )
+        # proba = booster.predict(X[va], num_iteration=booster.best_iteration)
+        models.append(booster)
+
+        log_summary(booster, save_model_checkpoint=True)
+    run.finish()
+    return models
+
+
+def train_xgboost_forest_cv(X, y, cfg: XGBoostForestTrainingConfig):
+    import numpy as np
+    import wandb
+    from sklearn.model_selection import StratifiedKFold
+
+    assert X.shape[0] == y.shape[0]
+    if cfg.assert_finite_X:
+        assert np.isfinite(X).all(), "X contains NaN/inf"
+
+    cfg.output_dir.mkdir(parents=True, exist_ok=True)
+
+    skf = StratifiedKFold(
+        n_splits=cfg.n_splits,
+        shuffle=True,
+        random_state=cfg.seed,
+    )
+
+    oof = np.zeros((len(y), cfg.n_classes), dtype=np.float32)
+    models = []
+
+    run = wandb.init(
+        project=cfg.wandb_project,
+        name=cfg.run_name,
+        config=cfg.model_dump(),
+    )
+
+    for fold, (tr, va) in enumerate(skf.split(X, y), 1):
+        model = XGBRFClassifier(**cfg.xgb_params())
+        model.fit(X[tr], y[tr])
+
+        proba = model.predict_proba(X[va])
+        oof[va] = proba
+
+        if cfg.save_artifacts:
+            path = cfg.output_dir / f"xgbrf_fold{fold}.json"
+            model.save_model(path)
+            art = wandb.Artifact(f"xgbrf_fold{fold}", type="model")
+            art.add_file(path)
+            run.log_artifact(art)
+
+        models.append(model)
+
+    run.finish()
+    return models, oof
