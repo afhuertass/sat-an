@@ -20,45 +20,36 @@
     {
       "id": "MJUe",
       "code_hash": "c57661334cf6ed3670bad84d9914f32e",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
+      "outputs": [],
       "console": []
     },
     {
       "id": "vblA",
       "code_hash": "60a977cade8a031142b7bd23837841e0",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
+      "outputs": [],
       "console": []
     },
     {
       "id": "bkHC",
       "code_hash": "bec3b8048f5888f97c47cbeca5ff68ca",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
+      "outputs": [],
       "console": []
     },
     {
       "id": "lEQa",
       "code_hash": "1fa221de58554dea642ffbb34c792e6c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "10db85e91f117e42465d8bb054302642",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "55b3097624c9b63b9e9f2c6457582a4f",
       "outputs": [
         {
           "type": "data",
@@ -70,8 +61,8 @@
       "console": []
     },
     {
-      "id": "Xref",
-      "code_hash": "685f5c2b3d712e2b1a57cfe54b49ebad",
+      "id": "SFPL",
+      "code_hash": "7e5bc1fa57e029cacb389722505518b1",
       "outputs": [
         {
           "type": "data",
@@ -84,19 +75,50 @@
         {
           "type": "stream",
           "name": "stdout",
-          "text": "asdasd\n",
+          "text": "(3884, 4359)\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "/var/folders/54/tfksswc132vf24kj6pr0sgpw0000gn/T/marimo_3953/__marimo__cell_Xref_.py:13: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.\n  t_len = _ds.dims[\"t\"]\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "(8135066, 18)\n(8135066,)\n(8135066, 2)\n",
           "mimetype": "text/plain"
         }
       ]
     },
     {
-      "id": "FGWt",
-      "code_hash": "1b050503f3f7091ec85fe457501efe46",
+      "id": "BYtC",
+      "code_hash": "fb1b8c2e2fd04e6de0a2608396c166a2",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/plain": ""
+            "text/html": "<pre class='text-xs'>array([[391425., 276785.],\n       [391435., 276785.],\n       [391445., 276785.],\n       ...,\n       [371095., 237975.],\n       [371105., 237975.],\n       [371115., 237975.]], shape=(8135066, 2))</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "f1d41ee25031ff5764c87535f7f1f839",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "pGgM",
+      "code_hash": "587689c1f52972ab59db519d3b9134d4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>&lt;weave.trace.weave_client.WeaveClient object at 0xc6c285400&gt;</pre>"
           }
         }
       ],
@@ -104,109 +126,97 @@
         {
           "type": "stream",
           "name": "stderr",
-          "text": "/var/folders/54/tfksswc132vf24kj6pr0sgpw0000gn/T/marimo_5732/__marimo__cell_Xref_.py:5: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.\n  t_len = _ds.dims[\"t\"]\n",
-          "mimetype": "text/plain"
-        },
-        {
-          "type": "stream",
-          "name": "stdout",
-          "text": "(8135068, 18)\n(8135068,)\n",
+          "text": "\u001b[36m\u001b[1mweave\u001b[0m: Logged in as Weights & Biases user: justinian.\n\u001b[36m\u001b[1mweave\u001b[0m: View Weave data at https://wandb.ai/justinian/intro-example/weave\n",
           "mimetype": "text/plain"
         }
       ]
     },
     {
-      "id": "BYtC",
-      "code_hash": "8cb88b5320ef78129e88ad349a44fa34",
-      "outputs": [],
-      "console": []
-    },
-    {
-      "id": "RGSE",
-      "code_hash": "358c031015fc3149e12cd2856c9c76dd",
-      "outputs": [],
-      "console": []
-    },
-    {
       "id": "Kclp",
-      "code_hash": "eaab362e5f3434f06f8563ac01cae737",
+      "code_hash": "6e9b91c4f7afc458abffa6aa6d9a8841",
       "outputs": [],
       "console": []
     },
     {
       "id": "emfo",
-      "code_hash": "fdd6a1ff49625e3fe9dcb279085f52bf",
+      "code_hash": "11ddeca05dfb53503d444e6c054e7eee",
       "outputs": [],
       "console": []
     },
     {
       "id": "Hstk",
-      "code_hash": "b3cbdfa6d8ef72c82c6325d908b6f47b",
+      "code_hash": "fdd6a1ff49625e3fe9dcb279085f52bf",
       "outputs": [],
       "console": []
     },
     {
       "id": "nWHF",
-      "code_hash": "225c369b4adebfccaaa06d1102da6a7e",
+      "code_hash": "b3cbdfa6d8ef72c82c6325d908b6f47b",
       "outputs": [],
       "console": []
     },
     {
       "id": "iLit",
-      "code_hash": "996028bcce0ca9798ef7177cc0ed6da2",
+      "code_hash": "225c369b4adebfccaaa06d1102da6a7e",
       "outputs": [],
       "console": []
     },
     {
       "id": "ZHCJ",
-      "code_hash": "6a1438cd0c4d45e61eeca638fea32795",
+      "code_hash": "996028bcce0ca9798ef7177cc0ed6da2",
       "outputs": [],
       "console": []
     },
     {
       "id": "ROlb",
-      "code_hash": "389589d027eaf18594c348d6a8e609f8",
+      "code_hash": "6a1438cd0c4d45e61eeca638fea32795",
       "outputs": [],
       "console": []
     },
     {
       "id": "qnkX",
-      "code_hash": "2fab566662043b181071755b443ea828",
+      "code_hash": "389589d027eaf18594c348d6a8e609f8",
       "outputs": [],
       "console": []
     },
     {
       "id": "TqIu",
-      "code_hash": "3a845ce582d85274069c32576f2e0868",
+      "code_hash": "2fab566662043b181071755b443ea828",
       "outputs": [],
       "console": []
     },
     {
       "id": "Vxnm",
-      "code_hash": "f08a6596f4c4403a65302aaa5773cc9e",
+      "code_hash": "3a845ce582d85274069c32576f2e0868",
       "outputs": [],
       "console": []
     },
     {
       "id": "DnEU",
-      "code_hash": "532f064980f6fb63b5b4baa06687733d",
+      "code_hash": "f08a6596f4c4403a65302aaa5773cc9e",
       "outputs": [],
       "console": []
     },
     {
       "id": "ulZA",
-      "code_hash": "52277fb0edb67048f85f1e9fe23ea551",
+      "code_hash": "532f064980f6fb63b5b4baa06687733d",
       "outputs": [],
       "console": []
     },
     {
       "id": "ecfG",
-      "code_hash": "30caf4ad746f71cc49f4fecc930d2c4b",
+      "code_hash": "52277fb0edb67048f85f1e9fe23ea551",
       "outputs": [],
       "console": []
     },
     {
       "id": "Pvdt",
+      "code_hash": "30caf4ad746f71cc49f4fecc930d2c4b",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
       "code_hash": null,
       "outputs": [],
       "console": []

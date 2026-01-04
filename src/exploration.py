@@ -54,128 +54,195 @@ def _():
 
 
 @app.cell
+def _(gpd, unidecode):
+    def prepare_towns_from_json():
+        """Clean up function to standirize the town names"""
+
+        _df = gpd.read_file("./data/Colombia_departamentos_municipios_CNPV2018.topojson")
+        _df = _df[ [ "MPIO_CNMBR" , "LATITUD" , "LONGITUD" , "geometry"] ]
+
+        _df = _df.rename(
+            columns = {
+                "MPIO_CNMBR":"region_name"
+            }
+        )
+        _df["region_name"] = _df["region_name"].str.lower().str.replace(" ", "-").apply(lambda x: unidecode(x))
+        _df["region_name"].unique()
+        _df.to_file("data/colombian-towns.geojson")
+
+    prepare_towns_from_json()
+    return
+
+
+@app.cell
 def _(gpd, np, rasterio, xr):
-    def create_features(df_overlays , path_to_nc, t: int , label_in_df: str ):
+    def create_features(
+        df_overlays: gpd.GeoDataFrame, path_to_nc: str, t: int, label_in_df: str
+    ) -> tuple[np.array, np.array, np.array]:
         _ds = xr.open_dataset(path_to_nc)
+
+        _resu = _ds.to_dict()
+        proje_string = _resu["data_vars"]["crs"]["attrs"]["crs_wkt"]
+
         # I'll create labels assuming for now there is always band B02
-        labels, output_shape = create_labels( df_overlays , _ds , band = "B02" , t = 0  , label_in_df = label_in_df)
+        labels, output_shape = create_labels(
+            df_overlays, _ds, band="B02", t=0, label_in_df=label_in_df
+        )
         t_len = _ds.dims["t"]
-        n_bands = len( _ds.data_vars.items() ) - 1
-        n_pixels = output_shape[0]*output_shape[1]
-        X_tybx = np.empty((t_len, output_shape[0], output_shape[1], n_bands) , dtype=np.float32)
+        n_bands = len(_ds.data_vars.items()) - 1
+        y_size = output_shape[0]
+        x_size = output_shape[1]
+
+        n_pixels = output_shape[0] * output_shape[1]
+        X_tybx = np.empty(
+            (t_len, output_shape[0], output_shape[1], n_bands), dtype=np.float32
+        )
         iband = 0
         for band, da in _ds.data_vars.items():
             if "crs" in band:
                 continue
             else:
                 X_tybx[:, :, :, iband] = da.values.astype(np.float32)
-                iband +=1 
+                iband += 1
 
-        n_bands = len( _ds.data_vars.items() ) - 1 
+        n_bands = len(_ds.data_vars.items()) - 1
+        spatial_x = _ds["x"].values
+        spatial_y = _ds["y"].values
+
+        # Commentings for now the projection, it was killing my machine :(
+        # ref = CRS.from_string(proje_string)
+        # good_p = Proj( proje_string )
+        # lon, lat = np.meshgrid(
+        #    spatial_y, spatial_x
+        # )
+        # spatial_x, spatial_y = good_p(lon, lat, inverse=True)
         _ds.close()
-        X = X_tybx.reshape(t_len, n_pixels, n_bands).transpose(1, 0, 2)
-        #X = np.stack(features, axis=0)           
-        #X = np.moveaxis(X, 0, -1)
-        X = X.reshape(n_pixels , -1 )        
-    
-        mask = np.all(np.isfinite(X), axis=1)
-        X_train = X[mask]
-        y_train = labels[mask]
+        ## Masking the invalid pixels
+        valid_mask_yx = np.isfinite(X_tybx).all(axis=(0, 3))
+        rows, cols = np.where(valid_mask_yx)
+        # lon, lat = good_p(lon, lat, inverse=True)
+        x_valid = spatial_x[cols]
+        y_valid = spatial_y[rows]
 
-        return X_train , y_train
+        coords_xy = np.column_stack([x_valid, y_valid])
+        n_valid = rows.size
+        X_valid_tyb = X_tybx[:, rows, cols, :]
+        X_valid = np.transpose(X_valid_tyb, (1, 0, 2))
+        X_valid = X_valid.reshape(n_valid, -1)
+        # valid labels
+        labels_valid = labels[rows, cols]
 
-    def create_labels(  geometry_df , _ds : xr.Dataset , band: str  , t: int, label_in_df: str ):
-    
+        return X_valid, labels_valid, coords_xy
+
+
+    def create_labels(
+        geometry_df, _ds: xr.Dataset, band: str, t: int, label_in_df: str
+    ):
         _crs = _ds["crs"].attrs.get("crs_wkt")
-        geometry_df = geometry_df.to_crs( _crs )
-        _da = _ds.isel(t = t )[band]
+        geometry_df = geometry_df.to_crs(_crs)
+        _da = _ds.isel(t=t)[band]
         output_shape = _da.shape
         transform = _da.rio.transform()
         classes = sorted(geometry_df[label_in_df].dropna().unique())
-        class_to_id = {c:i+1 for i,c in enumerate(classes)}
-    
-        shapes = ((geom, class_to_id[label]) for geom, label in zip(geometry_df.geometry, geometry_df[label_in_df]))
+        class_to_id = {c: i + 1 for i, c in enumerate(classes)}
+
+        shapes = (
+            (geom, class_to_id[label])
+            for geom, label in zip(geometry_df.geometry, geometry_df[label_in_df])
+        )
         label_raster = rasterio.features.rasterize(
             shapes=shapes,
             out_shape=output_shape,
             transform=transform,
             fill=0,
-            dtype="int16"
+            dtype="int16",
         )
-        y = label_raster.reshape(-1)  
-    
-        return y , output_shape 
-
-    geometry = gpd.read_file("/Users/andres/sat/sat-anomaly/src/data/overlay_soil_use_2027.shp")
-
-    print("asdasd")
-    return create_features, geometry
+        y = label_raster.reshape(output_shape)
+        print(output_shape)
+        return y, output_shape
+    return (create_features,)
 
 
 @app.cell
-def _(create_features, geometry):
+def _(create_features, gpd):
 
     path_to_nc = "/Users/andres/sat/sat-anomaly/data/results/visible-la-plata/openEO.nc"
+    geometry = gpd.read_parquet("./data/soil_use_labels.parquet")
+    X , Y , coords = create_features(df_overlays=geometry, path_to_nc=path_to_nc , t = 0 , label_in_df="Vocacion")
+    print(X.shape)
+    print(Y.shape)
+    print(coords.shape )
+    return (coords,)
 
-    _X , _Y = create_features(df_overlays=geometry, path_to_nc=path_to_nc , t = 0 , label_in_df="Vocacion")
-    print(_X.shape)
-    print(_Y.shape)
+
+@app.cell
+def _(coords):
+    coords
     return
 
 
-@app.cell
-def _(gpd, unidecode):
+app._unparsable_cell(
+    r"""
     def create_overlay(
         shape_town: gpd.GeoDataFrame, classification: gpd.GeoDataFrame, output: str
     ):
+        \"\"\" Create the overlays between the \"\"\"
         _df = shape_town.to_crs(classification.crs)
-        _df_overlay = gpd.overlay(_df, classification, how="intersection")
-        _df_overlay = _df_overlay.rename(columns={"MPIO_CNMBR": "region_name" , "Vocacion" : "classification"})
-        _df_overlay["region_name"] = (
-            _df_overlay["region_name"]
-            .str.lower()
-            .str.replace(" ", "-")
-            .apply(lambda x: unidecode(x))
-        )
-        gpd.write_file(output)
+        _df_overlay = gpd.overlay(_df, classification, how=\"intersection\")
+        _df_overlay.to_parquet(output)
+        _df_overlay.
         return _df_overlay
 
 
     towns = gpd.read_file(
-        "/Users/andres/sat/sat-anomaly/src/data/colombian-towns.geojson"
+        \"./data/colombian-towns.geojson\"
     )
-    soil = gpd.read_file(
-        "/Users/andres/sat/sat-anomaly/src/data/other-data/ag_100k_vocacion_uso_2017/ag_100k_vocacion_uso_2017.shp"
+    soil_class = gpd.read_file(
+        \"./data/soil_use/ag_100k_vocacion_uso_2017.shp\"
     )
     ## create tnd store he overlay data 
     #df_ov = create_overlay(
     #    towns,
     #    soil_class,
-    #    "/Users/andres/sat/sat-anomaly/src/data/overlay_soil_use_2027.shp",
+    #    \"/Users/andres/sat/sat-anomaly/src/data/soil_use_labels.parquet\",
     #)
+    """,
+    name="_"
+)
+
+
+@app.cell
+def _():
+    # Ensure your dependencies are installed with:
+    # pip install openai weave
+
+    # Find your wandb API key at: https://wandb.ai/authorize
+    # Ensure that your wandb API key is available at:
+    # os.environ['WANDB_API_KEY'] = "<your_wandb_api_key>"
+
+    import os
+    import weave
+    from openai import OpenAI
+
+    # Find your wandb API key at: https://wandb.ai/authorize
+    weave.init('justinian/intro-example') 
+
+
     return
 
 
 @app.cell
 def _(gpd, plt):
-    soil_class = gpd.read_file("/Users/andres/sat/sat-anomaly/src/data/other-data/ag_100k_vocacion_uso_2017/ag_100k_vocacion_uso_2017.shp")
 
 
 
 
-    fig = plt.figure(figsize=[12,8])
-    ax = fig.add_axes([0, 0, 1, 1])
-    soil_class.plot(ax=ax, column = "Vocacion")
-    plt.title("Soil use")
-
-
-
-    df_overlay = gpd.read_file("/Users/andres/sat/sat-anomaly/src/data/overlay_soil_use_2027.shp")
+    df_overlay = gpd.read_parquet("./data/soil_use_labels.parquet")
 
 
     _fig = plt.figure(figsize=[12, 8])
     _ax = _fig.add_axes([0, 0, 1, 1])
-    df_overlay.query("region_nam.str.contains('bogota')").plot(
+    df_overlay.query("region_name.str.contains('bogota')").plot(
         ax=_ax, column="Vocacion", cmap="tab10", categorical=True, legend=True
     )
     plt.title("Soil use bogota - overlay")
@@ -184,7 +251,7 @@ def _(gpd, plt):
 
 @app.cell
 def _(df_overlay):
-    df_overlay.to_file()
+    df_overlay.head()
     return
 
 

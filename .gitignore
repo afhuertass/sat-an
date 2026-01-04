@@ -11,5 +11,11 @@ wheels/
 
 data/*
 
+output/*
+output/**
 src/data/*
 src/__marimo__/*
+src/__marimo__/**
+__marimo__/*
+__marimo__/**
+.env

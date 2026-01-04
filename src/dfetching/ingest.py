@@ -1,8 +1,9 @@
+import geopandas as gpd
 from openeo import DataCube
 from openeo.extra.spectral_indices import compute_indices
 from openeo.processes import linear_scale_range
+from unidecode import unidecode
 
-from data.local_data import get_aoi
 from validators.validators import IngestValidator
 
 # List of index to calculate from the SAR data
@@ -29,7 +30,7 @@ def get_data(ingest_params: IngestValidator, connection):
     job.start_and_wait()
     results = job.get_results()
 
-    results.download_files(f"../data/results/{out_name}")
+    results.download_files(f"../output/results/{out_name}")
 
     return
 
@@ -92,3 +93,21 @@ def get_cloud_mask(connection, aoi, temporal_extend):
         erosion_kernel_size=3,
     )
     return cloud_mask
+
+
+def get_aoi(region: str) -> dict:
+    _df = gpd.read_file("data/colombian-towns.geojson")
+    _df = _df.query(f"region_name == '{region}'")
+    return _df.to_geo_dict()
+
+
+def get_regions() -> list[str]:
+    df = gpd.read_file("data/colombian-towns.geojson")
+    df["region_name"] = (
+        df["region_name"]
+        .str.lower()
+        .str.replace(" ", "-")
+        .apply(lambda x: unidecode(x))
+    )
+    regions = list(df["region_name"].unique())
+    return regions

@@ -23,4 +23,7 @@ dependencies = [
     "h5netcdf>=1.7.3",
     "prefect>=3.6.9",
     "lightgbm>=4.6.0",
+    "pyarrow>=22.0.0",
+    "wandb>=0.23.1",
+    "weave>=0.52.22",
 ]
