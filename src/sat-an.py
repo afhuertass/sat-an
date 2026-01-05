@@ -57,6 +57,13 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
             str, typer.Argument(help="Startinng date to fetch data")
         ],
         end_date: Annotated[str, typer.Argument(help="End date of fetching")],
+        cloud: Annotated[
+            bool,
+            typer.Option(
+                "--cloud",
+                help="Save result to cloud",
+            ),
+        ] = False
     ) -> None:
         params = {"region": region, "start_date": start_date, "end_date": end_date}
         ingest_params = IngestValidator(**params)
@@ -64,7 +71,7 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
         connection = eo.connect(
             url="openeo.dataspace.copernicus.eu"
         ).authenticate_oidc()
-        get_data(ingest_params=ingest_params, connection=connection)
+        results = get_data(ingest_params=ingest_params, connection=connection, cloud=cloud)
 
 
     @app.command(help="Ingest raw data from sources.")
@@ -79,9 +86,13 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
         # Fetch training data for a region, the training data is for the 2017, that is where the labels are from
 
         ingest_params = IngestValidator(
-            **{ "region" : region , "start_date" : "2017-01-01" , "end_date" : "2017-12-31" }
+            **{
+                "region": region,
+                "start_date": "2017-01-01",
+                "end_date": "2017-12-31",
+            }
         )
-    
+
         return None
 
 
@@ -143,9 +154,9 @@ def _(app, gpd, mo, unidecode):
         )
         df["region_name"] = df["region_name"].str.lower().str.replace(" ", "-").apply(lambda x: unidecode(x))
         df["region_name"].unique()
-    
+
         df
-    
+
     return
 
 

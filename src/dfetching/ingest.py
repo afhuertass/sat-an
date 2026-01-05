@@ -1,10 +1,15 @@
+import os.path
+
 import geopandas as gpd
 from openeo import DataCube
 from openeo.extra.spectral_indices import compute_indices
 from openeo.processes import linear_scale_range
 from unidecode import unidecode
 
+from dfetching.gcloud_utils import NetCDFAsset
 from validators.validators import IngestValidator
+
+from .gcloud_utils import exists_cloud, upload_file
 
 # List of index to calculate from the SAR data
 index_to_calculate = ["NDVI", "NDMI", "NDRE1", "NDRE2", "NDRE5", "ANIR"]
@@ -17,22 +22,68 @@ INDEX_DICT = {
 }
 
 
-def get_data(ingest_params: IngestValidator, connection):
+def get_data(ingest_params: IngestValidator, connection, cloud):
     aoi = get_aoi(ingest_params.region)
     index_cube, visible_cube = retrieve_sat_region(
         aoi, connection, ingest_params.start_date, ingest_params.end_date
     )
-
     # visible_cube = visible_cube.save_result(format="GTiff")
     visible_cube = visible_cube.save_result(format="netcdf")
-    out_name = f"visible-{ingest_params.region}"
-    job = visible_cube.create_job(title=f"visible-{ingest_params.region}")
-    job.start_and_wait()
-    results = job.get_results()
+    local_path = _get_local_path(
+        "SENTINEL2_L2",
+        ingest_params.region,
+        ingest_params.start_date,
+        ingest_params.end_date,
+    )
+    local_nc_path = local_path + "openEO.nc"
+    print(local_nc_path)
+    if not os.path.isfile(local_nc_path):
+        job = visible_cube.create_job(title=f"visible-{ingest_params.region}")
+        job.start_and_wait()
+        results = job.get_results()
+        results.download_files(local_path)
+        if cloud:
+            netcdf_to_cloud(local_path=local_nc_path, ingest_params=ingest_params)
+    else:
+        if cloud:
+            netcdf_to_cloud(local_path=local_nc_path, ingest_params=ingest_params)
 
-    results.download_files(f"../output/results/{out_name}")
 
-    return
+def _get_local_path(
+    product_id: str, region_id: str, start_date: str, end_date: str
+) -> str:
+    """
+    Generates a local path based on the product, region, and date range.
+
+    Returns:
+        str: The generated key prefix for GCS objects.
+    """
+    # partition by region and year/month of the start (you could also use end)
+    start = start_date.strftime("%Y%m%d")  # type: ignore
+    end = end_date.strftime("%Y%m%d")  # type: ignore
+    y = start_date.year  # type: ignore
+    local_path = f"../output/satellite/{product_id}/region={region_id}/year={y}/start_{start}_end_{end}/"
+    os.makedirs(local_path, exist_ok=True)
+    return local_path
+
+
+def netcdf_to_cloud(local_path: str, ingest_params: IngestValidator):
+    start_date = ingest_params.start_date.strftime("%Y-%m-%d")  # type: ignore
+    end_date = ingest_params.end_date.strftime("%Y-%m-%d")  # type: ignore
+    print(start_date)
+    print(end_date)
+    netcdf_cloud_params = NetCDFAsset(
+        product_id="SENTINEL2_L2",
+        region_id=ingest_params.region,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    gc_key = netcdf_cloud_params.nc_key()
+    if exists_cloud(gc_key):
+        return gc_key
+    else:
+        upload_file(local_path, gc_key)
+        return gc_key
 
 
 def process_cube_training():

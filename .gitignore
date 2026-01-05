@@ -19,3 +19,5 @@ src/__marimo__/**
 __marimo__/*
 __marimo__/**
 .env
+
+**/__marimo__/**

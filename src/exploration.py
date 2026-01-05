@@ -232,6 +232,12 @@ def _():
 
 
 @app.cell
+def _(datetime):
+    datetime.date
+    return
+
+
+@app.cell
 def _(gpd, plt):
 
 

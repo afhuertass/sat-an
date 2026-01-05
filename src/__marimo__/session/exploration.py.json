@@ -132,6 +132,19 @@
       ]
     },
     {
+      "id": "byAj",
+      "code_hash": "b2b4b08cf30cff6b70cbac47ab8d3b47",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>&lt;class &#x27;datetime.date&#x27;&gt;</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
       "id": "Kclp",
       "code_hash": "6e9b91c4f7afc458abffa6aa6d9a8841",
       "outputs": [],

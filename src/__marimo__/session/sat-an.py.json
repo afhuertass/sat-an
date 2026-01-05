@@ -18,26 +18,41 @@
       "console": []
     },
     {
-      "id": "bkHC",
+      "id": "MJUe",
       "code_hash": "e4831b717a29075e2757623f336d31b6",
-      "outputs": [],
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "No module named 'gcloud_utils'",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/54/tfksswc132vf24kj6pr0sgpw0000gn/T/marimo_61829/__marimo__cell_MJUe_.py&quot;</span>, line <span class=\"m\">1</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">dfetching.ingest</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">get_data</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/src/dfetching/ingest.py&quot;</span>, line <span class=\"m\">2</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">gcloud_utils</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">upload_file</span>\n<span class=\"gr\">ModuleNotFoundError</span>: <span class=\"n\">No module named &#39;gcloud_utils&#39;</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "vblA",
+      "code_hash": "00638f7b6f0362e935dd65e2f1965a1c",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (ModuleNotFoundError): ",
+          "traceback": []
+        }
+      ],
       "console": []
     },
     {
-      "id": "lEQa",
-      "code_hash": "341104850b164a92814702df062a9cfc",
-      "outputs": [],
-      "console": []
-    },
-    {
-      "id": "PKri",
-      "code_hash": "869909a3d0161f592fa9368ee083cc80",
-      "outputs": [],
-      "console": []
-    },
-    {
-      "id": "Xref",
-      "code_hash": null,
+      "id": "bkHC",
+      "code_hash": "aef7084473e9a297d09c50fe53bfad40",
       "outputs": [],
       "console": []
     }

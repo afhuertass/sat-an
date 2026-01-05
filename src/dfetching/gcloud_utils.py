@@ -1,20 +1,19 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import xarray as xr
 from google.cloud import storage
+from pydantic import BaseModel
 
 
-@dataclass(frozen=True)
-class NetCDFAsset:
+class NetCDFAsset(BaseModel):
     product_id: str  # e.g. "sentinel2-l2a"
     region_id: str  # e.g. "18NYF" or "r034_c019"
-    start: date
-    end: date
+    start_date: str
+    end_date: str
     version: str = "v001"
 
     def key_prefix(self) -> str:
@@ -25,10 +24,10 @@ class NetCDFAsset:
             str: The generated key prefix for GCS objects.
         """
         # partition by region and year/month of the start (you could also use end)
-        y = self.start.year
-        m = f"{self.start.month:02d}"
-        span = f"start={self.start.isoformat()}_end={self.end.isoformat()}"
-        return f"satellite/{self.product_id}/region={self.region_id}/year={y}/month={m}/{span}/"
+
+        dt = datetime.strptime(self.start_date, "%Y-%m-%d")
+        y = dt.year
+        return f"satellite/{self.product_id}/region={self.region_id}/year={y}/"
 
     def filename_base(self) -> str:
         """
@@ -37,9 +36,14 @@ class NetCDFAsset:
         Returns:
             str: The constructed filename base.
         """
-        s = self.start.strftime("%Y%m%d")
-        e = self.end.strftime("%Y%m%d")
-        return f"tile_{self.region_id}_{s}_{e}_{self.version}"
+        from datetime import datetime
+
+        # Convert start_date and end_date to datetime objects for processing
+        start_dt = datetime.strptime(self.start_date, "%Y-%m-%d")
+        end_dt = datetime.strptime(self.end_date, "%Y-%m-%d")
+        s = start_dt.strftime("%Y%m%d")
+        e = end_dt.strftime("%Y%m%d")
+        return f"{self.region_id}_{s}_{e}_{self.version}"
 
     def nc_key(self) -> str:
         """
@@ -109,7 +113,7 @@ def download_file(gcs_key: str, local_path: str | Path) -> Path:
     return local_path
 
 
-def exists(gcs_key: str) -> bool:
+def exists_cloud(gcs_key: str) -> bool:
     """
     Checks if a file exists in Google Cloud Storage.
 
