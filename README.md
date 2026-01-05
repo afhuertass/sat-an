@@ -1,4 +1,4 @@
-# Satellite Anomaly Detection
+# Satellite Analysis and ML
 
 This repository contains the source code for a satellite data analysis, with a focus on Colombian towns and regions, currently under process, the goal is to fetch data from open data collections ( in particular Copernicus/Sentinell data collections )
 
@@ -25,9 +25,15 @@ uv sync
 
 Instructions on how to use the system will be provided here, detailing how to run the scripts and use the models.
 
-## Contributing
+### data fetching:
 
-Contributions are welcome! Please read the CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
+run for example:
+
+```bash
+uv run sat-an.py ingest la-plata 2025-01-01 2025-01-30
+```
+
+To fetch the satellite data for the colombian town of `La Plata` the code uses a GeoPandas region defined in a file, computes de spectral indices and stores the netcdf file. There is a '--cloud' option to store the data in a bucket (it requires cloud setup, instructions to come)
 
 ## License
 
