@@ -88,7 +88,7 @@ def upload_file(
     return f"gs://{bucket}/{gcs_key}"
 
 
-def download_file(bucket: str, gcs_key: str, local_path: str | Path) -> Path:
+def download_file(gcs_key: str, local_path: str | Path) -> Path:
     """
     Downloads a file from Google Cloud Storage to a local path.
 
@@ -101,7 +101,7 @@ def download_file(bucket: str, gcs_key: str, local_path: str | Path) -> Path:
         Path: The path to the downloaded file
     """
     client = gcs_client()
-    b = client.bucket(bucket)
+    b = client.bucket("sat-an")
     blob = b.blob(gcs_key)
     local_path = Path(local_path)
     local_path.parent.mkdir(parents=True, exist_ok=True)
@@ -109,12 +109,11 @@ def download_file(bucket: str, gcs_key: str, local_path: str | Path) -> Path:
     return local_path
 
 
-def exists(bucket: str, gcs_key: str) -> bool:
+def exists(gcs_key: str) -> bool:
     """
     Checks if a file exists in Google Cloud Storage.
 
     Args:
-        bucket (str): The GCS bucket to check
         gcs_key (str): The GCS key of the file to check
 
     Returns:
@@ -125,12 +124,11 @@ def exists(bucket: str, gcs_key: str) -> bool:
     return b.blob(gcs_key).exists(client)
 
 
-def list_keys(bucket: str, prefix: str) -> List[str]:
+def list_keys(prefix: str) -> List[str]:
     """
     Lists all keys in Google Cloud Storage within a specified bucket and prefix.
 
     Args:
-        bucket (str): The GCS bucket to list keys from
         prefix (str): The prefix to filter keys by
 
     Returns:
@@ -160,7 +158,6 @@ def open_netcdf_from_gcs(
 
 
 def open_netcdf_via_download(
-    bucket: str,
     asset: NetCDFAsset,
     cache_dir: str | Path = "./cache",
     engine: str = "h5netcdf",
@@ -172,5 +169,5 @@ def open_netcdf_via_download(
     cache_dir = Path(cache_dir)
     local_path = cache_dir / asset.filename_base() / (asset.filename_base() + ".nc")
     if not local_path.exists():
-        download_file(bucket, asset.nc_key(), local_path)
+        download_file(asset.nc_key(), local_path)
     return xr.open_dataset(local_path, engine=engine, chunks=chunks)
