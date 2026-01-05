@@ -18,6 +18,12 @@ class NetCDFAsset:
     version: str = "v001"
 
     def key_prefix(self) -> str:
+        """
+        Generates a GCS key prefix based on the product, region, and date range.
+
+        Returns:
+            str: The generated key prefix for GCS objects.
+        """
         # partition by region and year/month of the start (you could also use end)
         y = self.start.year
         m = f"{self.start.month:02d}"
@@ -25,15 +31,33 @@ class NetCDFAsset:
         return f"satellite/{self.product_id}/region={self.region_id}/year={y}/month={m}/{span}/"
 
     def filename_base(self) -> str:
+        """
+        Constructs the base filename for a NetCDF file using region, start, end dates, and version.
+
+        Returns:
+            str: The constructed filename base.
+        """
         s = self.start.strftime("%Y%m%d")
         e = self.end.strftime("%Y%m%d")
         return f"tile_{self.region_id}_{s}_{e}_{self.version}"
 
     def nc_key(self) -> str:
+        """
+        Generates the complete GCS key for a NetCDF file using the prefix and filename base.
+
+        Returns:
+            str: The full GCS key for the NetCDF file.
+        """
         return self.key_prefix() + self.filename_base() + ".nc"
 
 
 def gcs_client() -> storage.Client:
+    """
+    Creates a Google Cloud Storage client instance using default authentication methods.
+
+    Returns:
+        storage.Client: The authenticated Google Cloud Storage client.
+    """
     # Uses your `gcloud auth application-default login` credentials
     return storage.Client()
 
@@ -43,6 +67,17 @@ def upload_file(
     gcs_key: str,
     metadata: Optional[Dict[str, str]] = None,
 ) -> str:
+    """
+    Uploads a local file to Google Cloud Storage.
+
+    Args:
+        local_path (str | Path): File path of the file to upload
+        gcs_key (str): Destination key on GCS where the file will be stored
+        metadata (Optional[Dict[str, str]]): Additional metadata to set for the file
+
+    Returns:
+        str: Full URI of the uploaded file in GCS
+    """
     client = gcs_client()
     bucket = "sat-an"
     b = client.bucket(bucket)
@@ -54,6 +89,17 @@ def upload_file(
 
 
 def download_file(bucket: str, gcs_key: str, local_path: str | Path) -> Path:
+    """
+    Downloads a file from Google Cloud Storage to a local path.
+
+    Args:
+        bucket (str): The GCS bucket from which the file is to be downloaded
+        gcs_key (str): The GCS key of the file to be downloaded
+        local_path (str | Path): Local path where the file will be saved
+
+    Returns:
+        Path: The path to the downloaded file
+    """
     client = gcs_client()
     b = client.bucket(bucket)
     blob = b.blob(gcs_key)
@@ -64,12 +110,32 @@ def download_file(bucket: str, gcs_key: str, local_path: str | Path) -> Path:
 
 
 def exists(bucket: str, gcs_key: str) -> bool:
+    """
+    Checks if a file exists in Google Cloud Storage.
+
+    Args:
+        bucket (str): The GCS bucket to check
+        gcs_key (str): The GCS key of the file to check
+
+    Returns:
+        bool: True if the file exists, False otherwise
+    """
     client = gcs_client()
     b = client.bucket("sat-an")
     return b.blob(gcs_key).exists(client)
 
 
 def list_keys(bucket: str, prefix: str) -> List[str]:
+    """
+    Lists all keys in Google Cloud Storage within a specified bucket and prefix.
+
+    Args:
+        bucket (str): The GCS bucket to list keys from
+        prefix (str): The prefix to filter keys by
+
+    Returns:
+        List[str]: A list of keys under the given bucket and prefix
+    """
     client = gcs_client()
     b = client.bucket("sat-an")
     return [blob.name for blob in client.list_blobs(b, prefix=prefix)]
