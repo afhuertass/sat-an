@@ -22,34 +22,51 @@ INDEX_DICT = {
 }
 
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
 def get_data(ingest_params: IngestValidator, connection, cloud):
+    logging.info("Starting data retrieval for region: %s", ingest_params.region)
     aoi = get_aoi(ingest_params.region)
     index_cube, visible_cube = retrieve_sat_region(
         aoi, connection, ingest_params.start_date, ingest_params.end_date
     )
+    logging.info("DataCube completed for region: %s", ingest_params.region)
     # visible_cube = visible_cube.save_result(format="GTiff")
     visible_cube = visible_cube.save_result(format="netcdf")
-    local_path = _get_local_path(
+    local_path = get_local_path(
         "SENTINEL2_L2",
         ingest_params.region,
         ingest_params.start_date,
         ingest_params.end_date,
     )
+    logging.info("Local path for saving data: %s", local_path)
     local_nc_path = local_path + "openEO.nc"
-    print(local_nc_path)
     if not os.path.isfile(local_nc_path):
         job = visible_cube.create_job(title=f"visible-{ingest_params.region}")
         job.start_and_wait()
+        logging.info("Job started and completed for region: %s", ingest_params.region)
         results = job.get_results()
         results.download_files(local_path)
+        logging.info("Files downloaded to local path: %s", local_path)
         if cloud:
             netcdf_to_cloud(local_path=local_nc_path, ingest_params=ingest_params)
+        logging.info(
+            "NetCDF file already exists and uploaded to cloud for region: %s",
+            ingest_params.region,
+        )
     else:
         if cloud:
+            logging.info(
+                "NetCDF file already exists and uploaded to cloud for region: %s",
+                ingest_params.region,
+            )
             netcdf_to_cloud(local_path=local_nc_path, ingest_params=ingest_params)
 
 
-def _get_local_path(
+def get_local_path(
     product_id: str, region_id: str, start_date: str, end_date: str
 ) -> str:
     """
