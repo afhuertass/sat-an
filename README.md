@@ -41,6 +41,21 @@ To fetch the satellite data for the colombian town of `La Plata` the code uses a
 
 This project uses skypilot to launch machine learning jobs. There is need to create a GKE cluster, after the gcloud is properly configured:
 
+```bash
+export CLUSTER_NAME="testcluster"
+gcloud container clusters create "$CLUSTER_NAME" \
+  --project "$PROJECT_ID" \
+  --zone europe-north1-a \
+  --num-nodes 2 \
+  --machine-type e2-small
+```
+
+Then the `kube.config` can be fetched from the cloud and put in the right place:
+
+```bash
+gcloud container clusters get-credentials "$CLUSTER_NAME" --region europe-north-a
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

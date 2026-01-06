@@ -33,3 +33,7 @@ includedPermissions:
   - serviceusage.services.enable
   - serviceusage.services.list
   - serviceusage.services.use
+  - container.pods.list
+  - container.clusters.create
+  - container.clusters.get
+  - container.operations.get
