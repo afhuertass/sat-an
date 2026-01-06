@@ -1,0 +1,9 @@
+resources:
+  cloud: kubernetes
+  cpus: 1
+  memory: 1
+  accelerators: null # explicitly disable GPUs
+
+run: |
+  echo "Hello from SkyPilot on GKE"
+  sleep 60

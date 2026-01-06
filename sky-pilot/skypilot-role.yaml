@@ -1,0 +1,35 @@
+title: "Sat Img Compute Runner"
+description: "Minimal compute+network+serviceusage+iam read permissions for sat-img-col tooling."
+stage: "GA"
+includedPermissions:
+  - compute.disks.create
+  - compute.disks.list
+  - compute.firewalls.create
+  - compute.firewalls.delete
+  - compute.firewalls.get
+  - compute.globalOperations.get
+  - compute.instances.create
+  - compute.instances.delete
+  - compute.instances.get
+  - compute.instances.list
+  - compute.instances.setLabels
+  - compute.instances.setMetadata
+  - compute.instances.setServiceAccount
+  - compute.instances.start
+  - compute.instances.stop
+  - compute.networks.get
+  - compute.networks.list
+  - compute.networks.getEffectiveFirewalls
+  - compute.projects.get
+  - compute.subnetworks.list
+  - compute.subnetworks.use
+  - compute.subnetworks.useExternalIp
+  - compute.zoneOperations.get
+  - iam.roles.get
+  - iam.serviceAccounts.actAs
+  - iam.serviceAccounts.get
+  - resourcemanager.projects.get
+  - resourcemanager.projects.getIamPolicy
+  - serviceusage.services.enable
+  - serviceusage.services.list
+  - serviceusage.services.use

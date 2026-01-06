@@ -33,7 +33,13 @@ run for example:
 uv run sat-an.py ingest la-plata 2025-01-01 2025-01-30
 ```
 
+This requires an account in `https://dataspace.copernicus.eu/` so authentication there is needed to fetch the data.
+
 To fetch the satellite data for the colombian town of `La Plata` the code uses a GeoPandas region defined in a file, computes de spectral indices and stores the netcdf file. There is a '--cloud' option to store the data in a bucket (it requires cloud setup, instructions to come)
+
+### Training clusters:
+
+This project uses skypilot to launch machine learning jobs. There is need to create a GKE cluster, after the gcloud is properly configured:
 
 ## License
 

@@ -11,6 +11,7 @@ from xgboost import XGBRFClassifier
 def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     """
     Trains a LightGBM model using stratified k-fold cross-validation.
+    Log the results to a Wandb project
 
     Parameters:
         X (pd.DataFrame): The input features.
