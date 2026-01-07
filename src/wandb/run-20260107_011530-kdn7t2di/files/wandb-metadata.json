@@ -1,0 +1,43 @@
+{
+  "os": "macOS-15.7.2-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.13.0",
+  "startedAt": "2026-01-06T23:15:30.694245Z",
+  "args": [
+    "train",
+    "la-plata",
+    "-p",
+    "model_type=lgb"
+  ],
+  "program": "/Users/andres/sat/sat-anomaly/src/sat-an.py",
+  "codePath": "src/sat-an.py",
+  "codePathLocal": "sat-an.py",
+  "git": {
+    "remote": "git@github.com-personal:afhuertass/sat-an.git",
+    "commit": "9c31029c3fcafd23971307aa96b9b5de615b8d8a"
+  },
+  "email": "afhuertass@unal.edu.co",
+  "root": "/Users/andres/sat/sat-anomaly/src",
+  "host": "192.168.2.6",
+  "executable": "/Users/andres/sat/sat-anomaly/.venv/bin/python3",
+  "cpu_count": 10,
+  "cpu_count_logical": 10,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "405536530432"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "apple": {
+    "name": "Apple M4",
+    "ecpuCores": 6,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 16,
+    "swapTotalBytes": "21474836480",
+    "ramTotalBytes": "17179869184"
+  },
+  "writerId": "fh5a0q5qi6yphk18uqj1np1jzqmj9337"
+}

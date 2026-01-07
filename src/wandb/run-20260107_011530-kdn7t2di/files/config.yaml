@@ -1,0 +1,102 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            fh5a0q5qi6yphk18uqj1np1jzqmj9337:
+                apple:
+                    ecpuCores: 6
+                    gpuCores: 10
+                    memoryGb: 16
+                    name: Apple M4
+                    pcpuCores: 4
+                    ramTotalBytes: "17179869184"
+                    swapTotalBytes: "21474836480"
+                args:
+                    - train
+                    - la-plata
+                    - -p
+                    - model_type=lgb
+                codePath: src/sat-an.py
+                codePathLocal: sat-an.py
+                cpu_count: 10
+                cpu_count_logical: 10
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "405536530432"
+                email: afhuertass@unal.edu.co
+                executable: /Users/andres/sat/sat-anomaly/.venv/bin/python3
+                git:
+                    commit: 9c31029c3fcafd23971307aa96b9b5de615b8d8a
+                    remote: git@github.com-personal:afhuertass/sat-an.git
+                host: 192.168.2.6
+                memory:
+                    total: "17179869184"
+                os: macOS-15.7.2-arm64-arm-64bit-Mach-O
+                program: /Users/andres/sat/sat-anomaly/src/sat-an.py
+                python: CPython 3.13.0
+                root: /Users/andres/sat/sat-anomaly/src
+                startedAt: "2026-01-06T23:15:30.694245Z"
+                writerId: fh5a0q5qi6yphk18uqj1np1jzqmj9337
+        m: []
+        python_version: 3.13.0
+        t:
+            "1":
+                - 5
+                - 6
+                - 8
+                - 53
+                - 105
+            "2":
+                - 5
+                - 6
+                - 8
+                - 53
+                - 105
+            "3":
+                - 13
+                - 16
+            "4": 3.13.0
+            "5": 0.23.1
+            "12": 0.23.1
+            "13": darwin-arm64
+assert_finite_X:
+    value: true
+colsample_bytree:
+    value: 0.8
+early_stopping_rounds:
+    value: 100
+learning_rate:
+    value: 0.05
+log_every_n:
+    value: 50
+max_depth:
+    value: -1
+min_data_in_leaf:
+    value: 100
+n_classes:
+    value: 5
+n_jobs:
+    value: -1
+n_splits:
+    value: 5
+num_boost_round:
+    value: 2000
+num_class:
+    value: 5
+num_leaves:
+    value: 63
+output_dir:
+    value: models
+reg_lambda:
+    value: 1
+run_name:
+    value: aaa
+save_artifacts:
+    value: true
+seed:
+    value: 42
+subsample:
+    value: 0.8
+wandb_project:
+    value: soiluse-tabular

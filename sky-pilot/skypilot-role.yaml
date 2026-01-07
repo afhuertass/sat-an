@@ -37,3 +37,6 @@ includedPermissions:
   - container.clusters.create
   - container.clusters.get
   - container.operations.get
+  - container.nodes.list
+  - container.services.delete
+  - container.events.list

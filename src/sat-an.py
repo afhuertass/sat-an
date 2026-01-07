@@ -30,8 +30,20 @@ def _():
     from pyproj import CRS
     from pyproj import Proj
     import rasterio
+    from training.schemas import CLITrainParams
+    from training.training_loop import train_with_params
     import matplotlib.pyplot as plt
-    return Annotated, IngestValidator, eo, gpd, mo, typer, unidecode
+    return (
+        Annotated,
+        CLITrainParams,
+        IngestValidator,
+        eo,
+        gpd,
+        mo,
+        train_with_params,
+        typer,
+        unidecode,
+    )
 
 
 @app.cell
@@ -41,8 +53,43 @@ def _():
 
 
 @app.cell
-def _(Annotated, IngestValidator, eo, get_data, typer):
+def _(
+    Annotated,
+    CLITrainParams,
+    Dict,
+    IngestValidator,
+    cloud,
+    eo,
+    get_data,
+    train_with_params,
+    typer,
+):
     app = typer.Typer(help="CLI for the ML pipeline")
+
+
+    def parse_kv_list(kvs: list[str]) -> CLITrainParams:
+        out: Dict[str, str] = {}
+        for item in kvs:
+            if "=" not in item:
+                raise typer.BadParameter(
+                    f"Invalid param '{item}'. Expected key=value."
+                )
+            k, v = item.split("=", 1)
+            k = k.strip()
+            v = v.strip()
+            if not k:
+                raise typer.BadParameter(f"Invalid param '{item}'. Key is empty.")
+            out[k] = v
+
+        if not "model_type" in out.keys():
+            raise typer.BadParameter("model_type parameter expected")
+
+        model_type = out.pop("model_type", None)
+        cli_params = CLITrainParams(
+            **{"model_type": model_type, "model_params": out}
+        )
+
+        return cli_params
 
 
     @app.command(help="Ingest raw data from sources.")
@@ -63,7 +110,7 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
                 "--cloud",
                 help="Save result to cloud",
             ),
-        ] = False
+        ] = False,
     ) -> None:
         params = {"region": region, "start_date": start_date, "end_date": end_date}
         ingest_params = IngestValidator(**params)
@@ -71,7 +118,9 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
         connection = eo.connect(
             url="openeo.dataspace.copernicus.eu"
         ).authenticate_oidc()
-        results = get_data(ingest_params=ingest_params, connection=connection, cloud=cloud)
+        results = get_data(
+            ingest_params=ingest_params, connection=connection, cloud=cloud
+        )
 
 
     @app.command(help="Ingest raw data from sources.")
@@ -92,6 +141,40 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
                 "end_date": "2017-12-31",
             }
         )
+        connection = eo.connect(
+            url="openeo.dataspace.copernicus.eu"
+        ).authenticate_oidc()
+        results = get_data(
+            ingest_params=ingest_params, connection=connection, cloud=cloud
+        )
+
+
+    @app.command(help="")
+    def train(
+        region: Annotated[
+            str,
+            typer.Argument(
+                help="Region for which to fetch the training data. Training data is whole 2017"
+            ),
+        ],
+        params: Annotated[
+            list[str],
+            typer.Option(
+                "--param",
+                "-p",
+                help="Extra training params as key=value.Example: -p learning_rate=0.001 -p epochs=20",
+            ),
+        ] = None,
+    ) -> None:
+        ingest_params = IngestValidator(
+            **{
+                "region": region,
+                "start_date": "2017-01-01",
+                "end_date": "2017-12-31",
+            }
+        )
+        cli_params = parse_kv_list(params)
+        train_with_params(ingest_params, cli_params)
 
         return None
 
@@ -110,13 +193,6 @@ def _(Annotated, IngestValidator, eo, get_data, typer):
         print("[build-data] Building datasets...")
         print("[build-data] TODO: implement dataset building.")
         print("[build-data] Finished (placeholder).")
-
-
-    @app.command(help="Train the model.")
-    def train() -> None:
-        print("[train] Starting model training...")
-        print("[train] TODO: implement model training.")
-        print("[train] Finished (placeholder).")
 
 
     @app.command(help="Serve the trained model via an API.")
@@ -156,7 +232,6 @@ def _(app, gpd, mo, unidecode):
         df["region_name"].unique()
 
         df
-
     return
 
 

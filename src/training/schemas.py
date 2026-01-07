@@ -1,9 +1,14 @@
 """Module for random forest and gradient boost based pixel classifiers"""
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Literal
 
 from pydantic import BaseModel, Field
+
+
+class CLITrainParams(BaseModel):
+    model_type: Literal["xgb", "lgb"]
+    model_params: dict
 
 
 class BaseTrainingConfig(BaseModel):
@@ -17,7 +22,7 @@ class BaseTrainingConfig(BaseModel):
     wandb_project: str = Field(
         "soiluse-tabular", description="The Weight and Biases project to log to."
     )
-    run_name: str = Field(..., description="The name of the current run/session.")
+    run_name: str = Field("aaa", description="The name of the current run/session.")
 
     # I/O
     save_artifacts: bool = Field(
@@ -28,7 +33,7 @@ class BaseTrainingConfig(BaseModel):
     )
     # Dataset assumptions
     n_classes: int = Field(
-        ..., description="The number of unique classes in the dataset."
+        5, description="The number of unique classes in the dataset."
     )
     # Safety
     assert_finite_X: bool = Field(
@@ -73,6 +78,9 @@ class LightGBMTrainingConfig(BaseTrainingConfig):
         0.8, description="The subsample ratio of columns when constructing each tree."
     )
 
+    num_class: int = Field(
+        5, description="The number of parallel threads used to run LightGBM."
+    )
     # System
     n_jobs: int = Field(
         -1, description="The number of parallel threads used to run LightGBM."
@@ -143,3 +151,8 @@ class XGBoostForestTrainingConfig(BaseTrainingConfig):
             eval_metric="mlogloss",
             random_state=self.seed,
         )
+
+
+class TrainParams:
+    model_type: Literal["lgb", "xgb"]
+    model_params: LightGBMTrainingConfig | XGBoostForestTrainingConfig

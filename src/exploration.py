@@ -232,8 +232,13 @@ def _():
 
 
 @app.cell
-def _(datetime):
-    datetime.date
+def _():
+    import sky
+    task = sky.Task(run='echo hello SkyPilot')
+    task.set_resources(
+        sky.Resources(infra='kubernetes'))
+    sky.launch(task, cluster_name='my-cluster')
+
     return
 
 

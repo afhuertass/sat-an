@@ -1,11 +1,12 @@
 import lightgbm as lgb
 import wandb
 import xgboost
-from schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
 from sklearn.model_selection import StratifiedKFold
 from wandb.integration.lightgbm import log_summary, wandb_callback
 from wandb.integration.xgboost import WandbCallback
 from xgboost import XGBRFClassifier
+
+from .schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
 
 
 def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
