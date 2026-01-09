@@ -16,6 +16,7 @@ output/**
 src/data/*
 src/__marimo__/*
 src/__marimo__/**
+src/wandb/**
 __marimo__/*
 __marimo__/**
 .env
