@@ -10,34 +10,29 @@ def rioversion():
 
 
 def create_features(
-    df_overlays: gpd.GeoDataFrame, path_to_nc: str, label_in_df: str
+    df_overlays: gpd.GeoDataFrame, ds: xr.Dataset, label_in_df: str
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    _ds = xr.open_dataset(path_to_nc)
-
-    # _resu = _ds.to_dict()
-    # proje_string = _resu["data_vars"]["crs"]["attrs"]["crs_wkt"]
-
-    # I'll create labels assuming for now there is always band B02
+    # create labels assuming for now there is always band B02
     labels, output_shape = create_labels(
-        df_overlays, _ds, band="B02", t=0, label_in_df=label_in_df
+        df_overlays, ds, band="B02", t=0, label_in_df=label_in_df
     )
-    t_len = _ds.dims["t"]
-    n_bands = len(_ds.data_vars.items()) - 1
+    t_len = ds.dims["t"]
+    n_bands = len(ds.data_vars.items()) - 1
 
     X_tybx = np.empty(
         (t_len, output_shape[0], output_shape[1], n_bands), dtype=np.float32
     )
     iband = 0
-    for band, da in _ds.data_vars.items():
+    for band, da in ds.data_vars.items():
         if "crs" in band:
             continue
         else:
             X_tybx[:, :, :, iband] = da.values.astype(np.float32)
             iband += 1
 
-    n_bands = len(_ds.data_vars.items()) - 1
-    spatial_x = _ds["x"].values
-    spatial_y = _ds["y"].values
+    n_bands = len(ds.data_vars.items()) - 1
+    spatial_x = ds["x"].values
+    spatial_y = ds["y"].values
 
     # Commentings for now the projection, it was killing my machine :(
     # ref = CRS.from_string(proje_string)
@@ -46,7 +41,7 @@ def create_features(
     #    spatial_y, spatial_x
     # )
     # spatial_x, spatial_y = good_p(lon, lat, inverse=True)
-    _ds.close()
+    ds.close()
     ## Masking the invalid pixels
     valid_mask_yx = np.isfinite(X_tybx).all(axis=(0, 3))
     rows, cols = np.where(valid_mask_yx)

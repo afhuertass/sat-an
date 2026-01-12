@@ -70,7 +70,7 @@ def _(gpd, unidecode):
         _df["region_name"].unique()
         _df.to_file("data/colombian-towns.geojson")
 
-    prepare_towns_from_json()
+    #prepare_towns_from_json()
     return
 
 
@@ -128,7 +128,11 @@ def _(gpd, np, rasterio, xr):
         n_valid = rows.size
         X_valid_tyb = X_tybx[:, rows, cols, :]
         X_valid = np.transpose(X_valid_tyb, (1, 0, 2))
-        X_valid = X_valid.reshape(n_valid, -1)
+        # X_valid = X_valid.reshape(n_valid, -1)
+
+        # aggregate on the time dimension.
+        # Basically we are not doing any complex feature engineering. For now
+        X_valid = np.mean(X_valid, axis=1)
         # valid labels
         labels_valid = labels[rows, cols]
 
@@ -226,8 +230,6 @@ def _():
 
     # Find your wandb API key at: https://wandb.ai/authorize
     weave.init('justinian/intro-example') 
-
-
     return
 
 
@@ -238,7 +240,6 @@ def _():
     task.set_resources(
         sky.Resources(infra='kubernetes'))
     sky.launch(task, cluster_name='my-cluster')
-
     return
 
 

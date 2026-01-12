@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 class CLITrainParams(BaseModel):
     model_type: Literal["xgb", "lgb"]
+    cloud: bool = False
     model_params: dict
 
 

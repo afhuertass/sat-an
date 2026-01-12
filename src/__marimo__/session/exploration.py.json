@@ -7,7 +7,14 @@
     {
       "id": "Hbol",
       "code_hash": "b8257d1b8dc23e05b1507593eb2cc4a1",
-      "outputs": [],
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
       "console": []
     },
     {
@@ -36,21 +43,54 @@
     },
     {
       "id": "PKri",
-      "code_hash": "10db85e91f117e42465d8bb054302642",
+      "code_hash": "b59cff352e620baa0ae97284dc3e1a7e",
       "outputs": [],
       "console": []
     },
     {
       "id": "Xref",
-      "code_hash": "f80e0781cabb8d4354189e61d33d9fac",
-      "outputs": [],
+      "code_hash": "71e35496199cbb3f5a9a5668bc98722d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
       "console": []
     },
     {
       "id": "SFPL",
       "code_hash": "7e5bc1fa57e029cacb389722505518b1",
-      "outputs": [],
-      "console": []
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "(3884, 4359)\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "/var/folders/54/tfksswc132vf24kj6pr0sgpw0000gn/T/marimo_71246/__marimo__cell_Xref_.py:13: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.\n  t_len = _ds.dims[\"t\"]\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "(8135066, 3)\n(8135066,)\n(8135066, 2)\n",
+          "mimetype": "text/plain"
+        }
+      ]
     },
     {
       "id": "BYtC",
@@ -66,7 +106,7 @@
     },
     {
       "id": "Kclp",
-      "code_hash": "f8311f14f901425501c4d184271925ba",
+      "code_hash": "9406aceed694f091f3ff98ed0b8f27ba",
       "outputs": [],
       "console": []
     },

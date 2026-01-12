@@ -164,7 +164,7 @@ def open_netcdf_from_gcs(
 def open_netcdf_via_download(
     asset: NetCDFAsset,
     cache_dir: str | Path = "./cache",
-    engine: str = "h5netcdf",
+    engine: str = "netcdf4",
     chunks: Optional[Dict[str, int]] = None,
 ) -> xr.Dataset:
     """

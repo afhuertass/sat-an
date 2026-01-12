@@ -1,10 +1,14 @@
+import os
+
 import lightgbm as lgb
-import wandb
 import xgboost
+from dotenv import load_dotenv
 from sklearn.model_selection import StratifiedKFold
+from xgboost import XGBRFClassifier
+
+import wandb
 from wandb.integration.lightgbm import log_summary, wandb_callback
 from wandb.integration.xgboost import WandbCallback
-from xgboost import XGBRFClassifier
 
 from .schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
 
@@ -29,7 +33,9 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     )
     # oof = np.zeros((len(y), cfg.n_classes), dtype=np.float32)
     models = []
-    wandb.login()
+    # Login to weights and biases to log experiments
+    load_dotenv()
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,
