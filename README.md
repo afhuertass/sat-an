@@ -46,8 +46,7 @@ the training experiment can be launched, fetching training data first, and then 
 
 ```bash
 uv run sat-an.py ingest la-plata 2017-06-01 2017-09-30 --cloud
-
-`uv run python sat-an.py train la-plata -p model_type=lgb`
+uv run python sat-an.py train la-plata -p model_type=lgb
 ```
 
 Add a `.env` file to the root `src/.env` to have some key to Wandb to long the experiments there:
@@ -57,6 +56,9 @@ WANDB_API_KEY=5eb20XXXXXXXXXXX
 PROJECT_ID="google-cloud-project-id"
 REGION="europe-north1"
 ```
+
+As an example the output
+![Training output example in W&B](./output/others/TrainingRun-01.png)
 
 ### Inference
 
