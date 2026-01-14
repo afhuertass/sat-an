@@ -19,6 +19,7 @@ Clone the repository and install the required packages:
 git clone https://github.com/afhuertass/sat-an.git
 cd sat-anomaly
 uv sync
+cd src
 ```
 
 ## Usage
@@ -37,9 +38,37 @@ This requires an account in `https://dataspace.copernicus.eu/` so authentication
 
 In the previous command, we fetch the satellite data for the colombian town of `La Plata` the code uses a GeoPandas region defined in a file, computes de spectral indices and stores the netcdf file. There is a '--cloud' option to store the data in a bucket (it requires cloud setup, instructions to come)
 
+### Training models
+
+The training data is coming from the Colombian department of statistics (DANE). I was able to find the soil usage classification for the whole country for the year 2017. The training data consist then in these labels (that can be found in the `data/soil_use_labels.parquet`) and the spectral index data that is coming from Sentinel satelites. To simplify a bit I average the spectral index data, in the time dimention from June to September ( this is arbitrary choice of mine) and then assign the labels from DANE.
+
+the training experiment can be launched, fetching training data first, and then running:
+
+```bash
+uv run sat-an.py ingest la-plata 2017-06-01 2017-09-30 --cloud
+
+`uv run python sat-an.py train la-plata -p model_type=lgb`
+```
+
+Add a `.env` file to the root `src/.env` to have some key to Wandb to long the experiments there:
+
+```
+WANDB_API_KEY=5eb20XXXXXXXXXXX
+PROJECT_ID="google-cloud-project-id"
+REGION="europe-north1"
+```
+
+### Inference
+
+Comming soon
+
+### Model serving
+
+Comming soon
+
 ### Training clusters:
 
-This project uses skypilot to launch machine learning jobs. There is need to create a GKE cluster, after the gcloud is properly configured (recommended to create a service account and assign the permissions found in `skypilot-role.yaml`)
+This project uses skypilot to launch machine learning jobs on the Cloud. There is need to create a GKE cluster, after the gcloud is properly configured (recommended to create a service account and assign the permissions found in `skypilot-role.yaml`)
 :
 
 ```bash
