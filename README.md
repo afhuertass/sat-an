@@ -58,7 +58,7 @@ REGION="europe-north1"
 ```
 
 As an example the output
-![Training output example in W&B](./output/others/TrainingRun-01.png)
+![Training output example in W&B](./imgs/TrainingRun-01.png)
 
 ### Inference
 
