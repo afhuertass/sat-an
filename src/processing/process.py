@@ -3,6 +3,7 @@ import numpy as np
 import rasterio
 import rioxarray
 import xarray as xr
+from sklearn.preprocessing import LabelEncoder
 
 
 def rioversion():
@@ -56,7 +57,9 @@ def create_features(
     X_valid = X_valid.reshape(n_valid, -1)
     # valid labels
     labels_valid = labels[rows, cols]
-
+    labels_valid = labels_valid.reshape((-1))
+    le = LabelEncoder()
+    labels_valid = le.fit_transform(labels_valid)
     return X_valid, labels_valid, coords_xy
 
 
@@ -83,4 +86,4 @@ def create_labels(
         dtype="int16",
     )
     y = label_raster.reshape(output_shape)
-    return y, output_shape
+    return y, output_shape  # ignore: type

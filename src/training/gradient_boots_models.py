@@ -1,6 +1,7 @@
 import os
 
 import lightgbm as lgb
+import numpy as np
 import xgboost
 from dotenv import load_dotenv
 from sklearn.model_selection import StratifiedKFold
@@ -36,16 +37,21 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     # Login to weights and biases to log experiments
     load_dotenv()
     wandb.login(key=os.getenv("WANDB_API_KEY"))
+    params_wandb = cfg.lgb_params()
+    params_wandb["allow_val_change"] = True
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,
-        config=cfg.model_dump(),
+        config=params_wandb,
     )
+    n_classes = len(np.unique(y))
+    print("Final unique classes", np.unique(y))
     for _fold, (tr, va) in enumerate(skf.split(X, y), 1):
         dtrain = lgb.Dataset(X[tr], label=y[tr])
         dvalid = lgb.Dataset(X[va], label=y[va])
+        params = cfg.lgb_params()
         booster = lgb.train(
-            params=cfg.lgb_params(),
+            params=params,
             train_set=dtrain,
             valid_sets=[dvalid],
             num_boost_round=cfg.num_boost_round,
@@ -83,7 +89,8 @@ def train_xgboost_forest_cv(
     )
 
     models = []
-    wandb.login()
+    load_dotenv()
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,

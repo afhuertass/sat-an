@@ -137,8 +137,8 @@ def _(
         ingest_params = IngestValidator(
             **{
                 "region": region,
-                "start_date": "2017-01-01",
-                "end_date": "2017-12-31",
+                "start_date": "2017-06-01",
+                "end_date": "2017-09-30",
             }
         )
         connection = eo.connect(
@@ -169,8 +169,8 @@ def _(
         ingest_params = IngestValidator(
             **{
                 "region": region,
-                "start_date": "2017-01-01",
-                "end_date": "2017-12-31",
+                "start_date": "2017-06-01",
+                "end_date": "2017-09-30",
             }
         )
         cli_params = parse_kv_list(params)

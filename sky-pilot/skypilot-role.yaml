@@ -40,3 +40,4 @@ includedPermissions:
   - container.nodes.list
   - container.services.delete
   - container.events.list
+  - storage.objects.get

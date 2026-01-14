@@ -6,50 +6,46 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _():
-    import marimo as mo
-    import pandas as pd
-    import polars as pl
-    import numpy as np
-    from netCDF4 import Dataset
-    from matplotlib import gridspec
-    import xarray as xr
-    import folium
-    import json
-    import geopandas as gpd
     import datetime
-    import scipy
-    from unidecode import unidecode
-    import rioxarray
-    from rasterstats import zonal_stats
+    import json
+
+    import folium
+    import geopandas as gpd
+    import marimo as mo
+    import numpy as np
     import rasterio
+    import scipy
+    import xarray as xr
+    from unidecode import unidecode
+
     return datetime, folium, gpd, json, mo, np, rasterio, scipy, unidecode, xr
 
 
 @app.cell
 def _():
-    import h5netcdf
     return
 
 
 @app.cell
 def _():
-    from pyproj import CRS
-    from pyproj import Proj
     import matplotlib
+    from pyproj import CRS, Proj
+
     return CRS, Proj, matplotlib
 
 
 @app.cell
 def _():
     import openeo as eo
+    from openeo.processes import linear_scale_range
 
-    from openeo.processes import array_apply, linear_scale_range, reduce_dimension
     return eo, linear_scale_range
 
 
 @app.cell
 def _():
     import matplotlib.pyplot as plt
+
     return (plt,)
 
 
@@ -58,19 +54,22 @@ def _(gpd, unidecode):
     def prepare_towns_from_json():
         """Clean up function to standirize the town names"""
 
-        _df = gpd.read_file("./data/Colombia_departamentos_municipios_CNPV2018.topojson")
-        _df = _df[ [ "MPIO_CNMBR" , "LATITUD" , "LONGITUD" , "geometry"] ]
-
-        _df = _df.rename(
-            columns = {
-                "MPIO_CNMBR":"region_name"
-            }
+        _df = gpd.read_file(
+            "./data/Colombia_departamentos_municipios_CNPV2018.topojson"
         )
-        _df["region_name"] = _df["region_name"].str.lower().str.replace(" ", "-").apply(lambda x: unidecode(x))
+        _df = _df[["MPIO_CNMBR", "LATITUD", "LONGITUD", "geometry"]]
+
+        _df = _df.rename(columns={"MPIO_CNMBR": "region_name"})
+        _df["region_name"] = (
+            _df["region_name"]
+            .str.lower()
+            .str.replace(" ", "-")
+            .apply(lambda x: unidecode(x))
+        )
         _df["region_name"].unique()
         _df.to_file("data/colombian-towns.geojson")
 
-    #prepare_towns_from_json()
+    # prepare_towns_from_json()
     return
 
 
@@ -138,7 +137,6 @@ def _(gpd, np, rasterio, xr):
 
         return X_valid, labels_valid, coords_xy
 
-
     def create_labels(
         geometry_df, _ds: xr.Dataset, band: str, t: int, label_in_df: str
     ):
@@ -163,19 +161,23 @@ def _(gpd, np, rasterio, xr):
         )
         y = label_raster.reshape(output_shape)
         print(output_shape)
+        print("Number of unique classes", np.unique(y))
+        print(np.unique(y))
         return y, output_shape
+
     return (create_features,)
 
 
 @app.cell
 def _(create_features, gpd):
-
     path_to_nc = "/Users/andres/sat/sat-anomaly/data/results/visible-la-plata/openEO.nc"
     geometry = gpd.read_parquet("./data/soil_use_labels.parquet")
-    X , Y , coords = create_features(df_overlays=geometry, path_to_nc=path_to_nc , t = 0 , label_in_df="Vocacion")
+    X, Y, coords = create_features(
+        df_overlays=geometry, path_to_nc=path_to_nc, t=0, label_in_df="Vocacion"
+    )
     print(X.shape)
     print(Y.shape)
-    print(coords.shape )
+    print(coords.shape)
     return (coords,)
 
 
@@ -211,7 +213,7 @@ app._unparsable_cell(
     #    \"/Users/andres/sat/sat-anomaly/src/data/soil_use_labels.parquet\",
     #)
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -224,33 +226,26 @@ def _():
     # Ensure that your wandb API key is available at:
     # os.environ['WANDB_API_KEY'] = "<your_wandb_api_key>"
 
-    import os
     import weave
-    from openai import OpenAI
 
     # Find your wandb API key at: https://wandb.ai/authorize
-    weave.init('justinian/intro-example') 
+    weave.init("justinian/intro-example")
     return
 
 
 @app.cell
 def _():
     import sky
-    task = sky.Task(run='echo hello SkyPilot')
-    task.set_resources(
-        sky.Resources(infra='kubernetes'))
-    sky.launch(task, cluster_name='my-cluster')
+
+    task = sky.Task(run="echo hello SkyPilot")
+    task.set_resources(sky.Resources(infra="kubernetes"))
+    sky.launch(task, cluster_name="my-cluster")
     return
 
 
 @app.cell
 def _(gpd, plt):
-
-
-
-
     df_overlay = gpd.read_parquet("./data/soil_use_labels.parquet")
-
 
     _fig = plt.figure(figsize=[12, 8])
     _ax = _fig.add_axes([0, 0, 1, 1])
@@ -269,21 +264,22 @@ def _(df_overlay):
 
 @app.cell
 def _(xr):
-
-    _ds = xr.open_dataset("/Users/andres/sat/sat-anomaly/data/results/visible-la-plata/openEO.nc")
-    _ds.isel(t= 0)
+    _ds = xr.open_dataset(
+        "/Users/andres/sat/sat-anomaly/data/results/visible-la-plata/openEO.nc"
+    )
+    _ds.isel(t=0)
     return
 
 
 @app.cell
 def _(np, plt, xr):
-
-
-    ds = xr.open_dataset("/Users/andres/sat/sat-anomaly/data/results/visible-bogota,-d.c./openEO.nc")
-    #data = data.to_array(dim="bands")
-    #ds = ds.isel( t = 2 )
-    #value = data.to_numpy()
-    #value
+    ds = xr.open_dataset(
+        "/Users/andres/sat/sat-anomaly/data/results/visible-bogota,-d.c./openEO.nc"
+    )
+    # data = data.to_array(dim="bands")
+    # ds = ds.isel( t = 2 )
+    # value = data.to_numpy()
+    # value
 
     R = ds["B04"]  # red
     G = ds["B03"]  # green
@@ -333,7 +329,6 @@ def _(folium, json, selected_df):
             field = json.load(input)
         return field
 
-
     aoi = selected_df.to_geo_dict()
     # aoi = read_json("data/Colombia_departamentos_municipios_poblacion-topov2/MGN_ANM_DPTOS.geojson")
     # 4.6458778276651955, -74.107015224911
@@ -345,9 +340,7 @@ def _(folium, json, selected_df):
 
 @app.cell
 def _(eo):
-    connection = eo.connect(
-        url="openeo.dataspace.copernicus.eu"
-    ).authenticate_oidc()
+    connection = eo.connect(url="openeo.dataspace.copernicus.eu").authenticate_oidc()
     return (connection,)
 
 
@@ -373,6 +366,7 @@ def _():
 @app.cell
 def _():
     from openeo.extra.spectral_indices import compute_indices
+
     return (compute_indices,)
 
 
@@ -402,7 +396,6 @@ def _(
         filename = filename.replace(" ", "")
         return filename
 
-
     def plot_array_as_image(data_array, title="example", cmap="viridis"):
         """
         Plots a 2D NumPy array as an image using Matplotlib's imshow.
@@ -429,10 +422,7 @@ def _(
         # Display the plot
         plt.show()
 
-
-    def process_sat_region(
-        aoi, out_name, index_to_calculate: list = ["NBAI"]
-    ) -> str:
+    def process_sat_region(aoi, out_name, index_to_calculate: list = ["NBAI"]) -> str:
         """Apply the workflow to a given region"""
 
         bands = ["B02", "B03", "B04", "B08", "B11", "B12", "SCL"]
@@ -454,16 +444,16 @@ def _(
         mask = mask > 0.1
 
         cube_masked = cube.mask(mask)
-        indices = compute_indices(
-            cube, indices=index_to_calculate
-        ).reduce_dimension(reducer="mean", dimension="t")
+        indices = compute_indices(cube, indices=index_to_calculate).reduce_dimension(
+            reducer="mean", dimension="t"
+        )
 
         filename = get_name(out_name)
 
         indices.download(filename + ".nc")
 
-        # Visible bands 
-        cube_masked = cube.filter_bands( ["B04" , "B03" , "B02"])
+        # Visible bands
+        cube_masked = cube.filter_bands(["B04", "B03", "B02"])
         cube_masked = cube_masked.reduce_dimension(reducer="mean", dimension="t")
 
         cube_masked_scaled = cube_masked.apply(
@@ -476,7 +466,6 @@ def _(
         cube_masked_scaled.save_result(format="png")
         return filename
 
-
     def process_nc_data(filename: str, index: str, label=""):
         dataset = xr.open_dataset(filename)
         data = dataset[[index]].to_array(dim="bands")
@@ -485,7 +474,6 @@ def _(
         _resu = dataset.to_dict()
         proje_string = _resu["data_vars"]["crs"]["attrs"]["crs_wkt"]
 
-
         values = data.to_numpy()
         values_reshaped = values.reshape((y_size, x_size))
         values_reshaped = np.nan_to_num(values_reshaped, nan=0)
@@ -493,7 +481,7 @@ def _(
         # Projection part
         ref = CRS.from_string(proje_string)
 
-        good_p = Proj( proje_string ) 
+        good_p = Proj(proje_string)
         lon, lat = np.meshgrid(
             data.x.values.astype(np.float64), data.y.values.astype(np.float64)
         )
@@ -501,7 +489,6 @@ def _(
 
         plot_title = f"Index: {index}, {label}"
         plot_array_as_image(values_reshaped, title=plot_title)
-
 
     def get_true_color_image(filename: str):
         filename_path = filename + ".nc"
@@ -514,7 +501,6 @@ def _(
         plt.imshow(data_array)
         plt.show()
         return
-
 
     def rasterio_overlay(lat, lon, values):
         _m = folium.Map(location=[lat.mean(), lon.mean()], zoom_start=8)
@@ -535,7 +521,6 @@ def _(
         ).add_to(_m)
         _m
         return _m
-
 
     def create_map_plot(lon, lat, data, title="Geospatial Data Plot"):
         """
@@ -605,13 +590,14 @@ def _(
         # 5. Final touches
         ax.set_title(title, fontsize=16)
         plt.show()
+
     return
 
 
 @app.cell
 def _(muni_ind):
     out = muni_ind.value.strip().replace(" ", "")
-    #file = process_sat_region(aoi=aoi, out_name=out)
+    # file = process_sat_region(aoi=aoi, out_name=out)
     return
 
 

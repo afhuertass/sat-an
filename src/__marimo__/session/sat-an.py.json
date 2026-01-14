@@ -7,47 +7,19 @@
     {
       "id": "Hbol",
       "code_hash": "d3bdb68f626571ed8b44d64d979ec64d",
-      "outputs": [
-        {
-          "type": "error",
-          "ename": "exception",
-          "evalue": "dlopen(/Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/lib/lib_lightgbm.dylib, 0x0006): Library not loaded: @rpath/libomp.dylib\n  Referenced from: <D44045CD-B874-3A27-9A61-F131D99AACE4> /Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/lib/lib_lightgbm.dylib\n  Reason: tried: '/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/opt/local/lib/libomp/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib' (no such file), '/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/opt/local/lib/libomp/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib' (no such file)",
-          "traceback": []
-        }
-      ],
-      "console": [
-        {
-          "type": "stream",
-          "name": "stderr",
-          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/54/tfksswc132vf24kj6pr0sgpw0000gn/T/marimo_61327/__marimo__cell_Hbol_.py&quot;</span>, line <span class=\"m\">26</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">training.training_loop</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">train_with_params</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/src/training/training_loop.py&quot;</span>, line <span class=\"m\">3</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">training.gradient_boots_models</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">train_lgbm_cv</span><span class=\"p\">,</span> <span class=\"n\">train_xgboost_forest_cv</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/src/training/gradient_boots_models.py&quot;</span>, line <span class=\"m\">1</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">import</span><span class=\"w\"> </span><span class=\"nn\">lightgbm</span><span class=\"w\"> </span><span class=\"k\">as</span><span class=\"w\"> </span><span class=\"nn\">lgb</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/__init__.py&quot;</span>, line <span class=\"m\">11</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">.basic</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">Booster</span><span class=\"p\">,</span> <span class=\"n\">Dataset</span><span class=\"p\">,</span> <span class=\"n\">Sequence</span><span class=\"p\">,</span> <span class=\"n\">register_logger</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/basic.py&quot;</span>, line <span class=\"m\">9</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">.libpath</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">_LIB</span>  <span class=\"c1\"># isort: skip</span>\n<span class=\"w\">    </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/libpath.py&quot;</span>, line <span class=\"m\">49</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">_LIB</span> <span class=\"o\">=</span> <span class=\"n\">ctypes</span><span class=\"o\">.</span><span class=\"n\">cdll</span><span class=\"o\">.</span><span class=\"n\">LoadLibrary</span><span class=\"p\">(</span><span class=\"n\">_find_lib_path</span><span class=\"p\">()[</span><span class=\"mi\">0</span><span class=\"p\">])</span>\n  File <span class=\"nb\">&quot;/Users/andres/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/ctypes/__init__.py&quot;</span>, line <span class=\"m\">471</span>, in <span class=\"n\">LoadLibrary</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_dlltype</span><span class=\"p\">(</span><span class=\"n\">name</span><span class=\"p\">)</span>\n<span class=\"w\">           </span><span class=\"pm\">~~~~~~~~~~~~~^^^^^^</span>\n  File <span class=\"nb\">&quot;/Users/andres/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/ctypes/__init__.py&quot;</span>, line <span class=\"m\">390</span>, in <span class=\"n\">__init__</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_handle</span> <span class=\"o\">=</span> <span class=\"n\">_dlopen</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_name</span><span class=\"p\">,</span> <span class=\"n\">mode</span><span class=\"p\">)</span>\n<span class=\"w\">                   </span><span class=\"pm\">~~~~~~~^^^^^^^^^^^^^^^^^^</span>\n<span class=\"gr\">OSError</span>: <span class=\"n\">dlopen(/Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/lib/lib_lightgbm.dylib, 0x0006): Library not loaded: @rpath/libomp.dylib</span>\n<span class=\"x\">  Referenced from: &lt;D44045CD-B874-3A27-9A61-F131D99AACE4&gt; /Users/andres/sat/sat-anomaly/.venv/lib/python3.13/site-packages/lightgbm/lib/lib_lightgbm.dylib</span>\n<span class=\"x\">  Reason: tried: &#39;/opt/homebrew/opt/libomp/lib/libomp.dylib&#39; (no such file), &#39;/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib&#39; (no such file), &#39;/opt/local/lib/libomp/libomp.dylib&#39; (no such file), &#39;/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib&#39; (no such file), &#39;/opt/homebrew/opt/libomp/lib/libomp.dylib&#39; (no such file), &#39;/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib&#39; (no such file), &#39;/opt/local/lib/libomp/libomp.dylib&#39; (no such file), &#39;/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib&#39; (no such file)</span>\n</pre></div>\n</span>",
-          "mimetype": "application/vnd.marimo+traceback"
-        }
-      ]
+      "outputs": [],
+      "console": []
     },
     {
       "id": "MJUe",
       "code_hash": "e4831b717a29075e2757623f336d31b6",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
+      "outputs": [],
       "console": []
     },
     {
       "id": "vblA",
-      "code_hash": "515f95ef8b8f742acd40db5540df93af",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
+      "code_hash": "970cae2da6d632812a935df0af9567ea",
+      "outputs": [],
       "console": []
     },
     {

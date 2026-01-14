@@ -34,7 +34,7 @@ class BaseTrainingConfig(BaseModel):
     )
     # Dataset assumptions
     n_classes: int = Field(
-        5, description="The number of unique classes in the dataset."
+        8, description="The number of unique classes in the dataset."
     )
     # Safety
     assert_finite_X: bool = Field(
@@ -79,9 +79,7 @@ class LightGBMTrainingConfig(BaseTrainingConfig):
         0.8, description="The subsample ratio of columns when constructing each tree."
     )
 
-    num_class: int = Field(
-        5, description="The number of parallel threads used to run LightGBM."
-    )
+    num_class: int = Field(8, description="Number of classes")
     # System
     n_jobs: int = Field(
         -1, description="The number of parallel threads used to run LightGBM."
