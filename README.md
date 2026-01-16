@@ -2,8 +2,6 @@
 
 This repository contains the source code for a satellite data analysis, with a focus on Colombian towns and regions, currently under process, the goal is to fetch data from open data collections ( in particular Copernicus/Sentinell data collections )
 
-system designed to identify and analyze anomalies in satellite data.
-
 ## Features
 
 - **Data Fetching**: Module for retrieving and processing satellite data.
@@ -13,7 +11,7 @@ system designed to identify and analyze anomalies in satellite data.
 
 ## Installation
 
-Clone the repository and install the required packages:
+Clone the repository and install the required packages (`uv` package manager required):
 
 ```
 git clone https://github.com/afhuertass/sat-an.git
@@ -57,7 +55,7 @@ PROJECT_ID="google-cloud-project-id"
 REGION="europe-north1"
 ```
 
-As an example the output
+As an example the output in Weights and biases
 ![Training output example in W&B](./imgs/TrainingRun-01.png)
 
 ### Inference

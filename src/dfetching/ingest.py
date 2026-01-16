@@ -30,12 +30,17 @@ logging.basicConfig(level=logging.INFO)
 def get_data(ingest_params: IngestValidator, connection, cloud):
     logging.info("Starting data retrieval for region: %s", ingest_params.region)
     aoi = get_aoi(ingest_params.region)
-    index_cube, visible_cube = retrieve_sat_region(
+    index_cube, s2_cube = retrieve_s2l2(
+        aoi, connection, ingest_params.start_date, ingest_params.end_date
+    )
+    grd_cube = retrieve_s1_grd(
         aoi, connection, ingest_params.start_date, ingest_params.end_date
     )
     logging.info("DataCube completed for region: %s", ingest_params.region)
+
+    final_cube = s2_cube.merge_cubes(grd_cube)
     # visible_cube = visible_cube.save_result(format="GTiff")
-    visible_cube = visible_cube.save_result(format="netcdf")
+    final_cube = final_cube.save_result(format="netcdf")
     local_path = get_local_path(
         "SENTINEL2_L2",
         ingest_params.region,
@@ -45,7 +50,7 @@ def get_data(ingest_params: IngestValidator, connection, cloud):
     logging.info("Local path for saving data: %s", local_path)
     local_nc_path = local_path + "openEO.nc"
     if not os.path.isfile(local_nc_path):
-        job = visible_cube.create_job(title=f"visible-{ingest_params.region}")
+        job = final_cube.create_job(title=f"visible-{ingest_params.region}")
         job.start_and_wait()
         logging.info("Job started and completed for region: %s", ingest_params.region)
         results = job.get_results()
@@ -107,7 +112,30 @@ def process_cube_training():
     return
 
 
-def retrieve_sat_region(
+def retrieve_s1_grd(aoi: dict, connection, start_date, end_date) -> DataCube:
+    """Return SENTINEL1_GRD data. This is radar polarization data."""
+
+    col_id = "SENTINEL1_GRD"
+    bands = ["VV", "VH"]
+    temporal_extend = [start_date, end_date]
+
+    cube = connection.load_collection(
+        collection_id=col_id, temporal_extent=temporal_extend, bands=bands
+    ).filter_spatial(aoi)
+
+    cube = cube.aggregate_temporal_period("dekad", reducer="median")
+    cube = cube.apply_dimension(dimension="t", process="array_interpolate_linear")
+
+    cube_scaled = cube.apply(
+        lambda x: linear_scale_range(
+            x, inputMin=0, inputMax=5000, outputMin=0, outputMax=255
+        )
+    )
+
+    return cube_scaled
+
+
+def retrieve_s2l2(
     aoi: dict, connection, start_date, end_date
 ) -> tuple[DataCube, DataCube]:
     """returns a tuple of data cubes"""
@@ -136,7 +164,7 @@ def retrieve_sat_region(
     # Filter the computed indicex, this is to be used for features
     result_indices = combined.filter_bands(index_to_calculate + bands)
     # Visible bands
-    cube_visible = combined.filter_bands(["B04", "B03", "B02"])
+    cube_visible = combined.filter_bands(["B04", "B03", "B02", "B11", "B12"])
 
     cube_visible = cube_visible.apply(
         lambda x: linear_scale_range(

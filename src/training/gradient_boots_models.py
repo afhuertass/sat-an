@@ -4,6 +4,7 @@ import lightgbm as lgb
 import numpy as np
 import xgboost
 from dotenv import load_dotenv
+from sklearn.metrics import accuracy_score, f1_score, log_loss, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from xgboost import XGBRFClassifier
 
@@ -12,6 +13,28 @@ from wandb.integration.lightgbm import log_summary, wandb_callback
 from wandb.integration.xgboost import WandbCallback
 
 from .schemas import LightGBMTrainingConfig, XGBoostForestTrainingConfig
+
+
+def compute_multiclass_metrics(y_true, y_probs, prefix=""):
+    """
+    Computes metrics for multiclass classification.
+    y_probs: array-like of shape (n_samples, n_classes)
+    """
+    y_pred = np.argmax(y_probs, axis=1)
+
+    metrics = {
+        f"{prefix}accuracy": accuracy_score(y_true, y_pred),
+        f"{prefix}f1_macro": f1_score(y_true, y_pred, average="macro"),
+        f"{prefix}log_loss": log_loss(y_true, y_probs),
+    }
+
+    # OvR AUC is standard for multiclass
+    try:
+        metrics[f"{prefix}auc_ovr"] = roc_auc_score(y_true, y_probs, multi_class="ovr")
+    except ValueError:
+        metrics[f"{prefix}auc_ovr"] = 0.0
+
+    return metrics
 
 
 def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
@@ -39,14 +62,15 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
     wandb.login(key=os.getenv("WANDB_API_KEY"))
     params_wandb = cfg.lgb_params()
     params_wandb["allow_val_change"] = True
+    n_classes = params_wandb["num_class"]
+    oof_probs = np.zeros((len(X), n_classes))
     run = wandb.init(
         project=cfg.wandb_project,
         name=cfg.run_name,
         config=params_wandb,
     )
     n_classes = len(np.unique(y))
-    print("Final unique classes", np.unique(y))
-    for _fold, (tr, va) in enumerate(skf.split(X, y), 1):
+    for fold, (tr, va) in enumerate(skf.split(X, y), 1):
         dtrain = lgb.Dataset(X[tr], label=y[tr])
         dvalid = lgb.Dataset(X[va], label=y[va])
         params = cfg.lgb_params()
@@ -62,6 +86,15 @@ def train_lgbm_cv(X, y, cfg: LightGBMTrainingConfig) -> list[lgb.Booster]:
         )
         # proba = booster.predict(X[va], num_iteration=booster.best_iteration)
         models.append(booster)
+        fold_probs = booster.predict(X[va])
+
+        oof_probs[va] = fold_probs
+
+        fold_metrics = compute_multiclass_metrics(
+            y_val, fold_probs, prefix=f"fold_{fold}/"
+        )
+        wandb.log(fold_metrics)
+        print(f"Fold {fold} - Accuracy: {fold_metrics[f'fold_{fold}/accuracy']:.4f}")
 
         log_summary(booster, save_model_checkpoint=True)
     run.finish()
